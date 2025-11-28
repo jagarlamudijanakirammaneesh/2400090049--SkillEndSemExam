@@ -1,126 +1,53 @@
-// App.jsx
-import React, { useState } from "react";
-import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Portal</title>
+  <style>
+    .page { display: none; }
+  </style>
+</head>
+<body>
 
-// 🔒 ProtectedRoute component
-function ProtectedRoute({ isAuthenticated, children }) {
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-  return children;
-}
+  <!-- LOGIN PAGE -->
+  <div id="loginPage" class="page">
+    <h2>Student Login</h2>
+    <input id="user" placeholder="Student ID"><br><br>
+    <input id="pass" type="password" placeholder="Password"><br><br>
+    <button onclick="login()">Login</button>
+  </div>
 
-// 🧑‍🎓 Login Page
-function LoginPage({ onLogin }) {
-  const [studentId, setStudentId] = useState("");
-  const [password, setPassword] = useState("");
-  const navigate = useNavigate();
+  <!-- DASHBOARD PAGE -->
+  <div id="dashPage" class="page">
+    <h2>Student Dashboard</h2>
+    <p>Welcome, you are logged in.</p>
+    <button onclick="logout()">Logout</button>
+  </div>
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+<script>
+  // check login on load
+  showPage(localStorage.getItem("auth") === "true" ? "dashPage" : "loginPage");
 
-    // very basic "check" – replace with real auth in real app
-    if (studentId && password) {
-      onLogin(); // set auth = true
-      navigate("/dashboard");
-    } else {
-      alert("Enter student ID and password");
+  function login() {
+    let u = document.getElementById("user").value;
+    let p = document.getElementById("pass").value;
+
+    if (u && p) {
+      localStorage.setItem("auth", "true");
+      showPage("dashPage");
     }
-  };
+  }
 
-  return (
-    <div style={styles.container}>
-      <h2>Student Login Portal</h2>
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <input
-          type="text"
-          placeholder="Student ID"
-          value={studentId}
-          onChange={(e) => setStudentId(e.target.value)}
-          style={styles.input}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={styles.input}
-        />
-        <button type="submit" style={styles.button}>
-          Login
-        </button>
-      </form>
-    </div>
-  );
-}
+  function logout() {
+    localStorage.removeItem("auth");
+    showPage("loginPage");
+  }
 
-// 📊 Dashboard Page (protected)
-function Dashboard({ onLogout }) {
-  return (
-    <div style={styles.container}>
-      <h2>Student Dashboard</h2>
-      <p>Welcome to your portal.</p>
-      <button onClick={onLogout} style={styles.button}>
-        Logout
-      </button>
-    </div>
-  );
-}
+  // function to switch pages
+  function showPage(id) {
+    document.querySelectorAll(".page").forEach(p => p.style.display = "none");
+    document.getElementById(id).style.display = "block";
+  }
+</script>
 
-// 🌐 Main App
-export default function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  const handleLogin = () => setIsAuthenticated(true);
-  const handleLogout = () => setIsAuthenticated(false);
-
-  return (
-    <Routes>
-      <Route
-        path="/login"
-        element={<LoginPage onLogin={handleLogin} />}
-      />
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute isAuthenticated={isAuthenticated}>
-            <Dashboard onLogout={handleLogout} />
-          </ProtectedRoute>
-        }
-      />
-      {/* Default route – redirect to /login */}
-      <Route
-        path="*"
-        element={<Navigate to="/login" replace />}
-      />
-    </Routes>
-  );
-}
-
-// simple inline styles
-const styles = {
-  container: {
-    maxWidth: "400px",
-    margin: "80px auto",
-    padding: "24px",
-    border: "1px solid #ccc",
-    borderRadius: "10px",
-    textAlign: "center",
-    fontFamily: "sans-serif",
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "12px",
-    marginTop: "16px",
-  },
-  input: {
-    padding: "10px",
-    fontSize: "14px",
-  },
-  button: {
-    padding: "10px",
-    fontSize: "14px",
-    cursor: "pointer",
-  },
-};
+</body>
+</html>
